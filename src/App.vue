@@ -1,29 +1,45 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-
-    <Sau />
+    <img alt="Drecksau" src="./assets/dreckig.png">
+    <ConfigGame v-if="spielers.length === 0" @start="start" />
+    <div v-for="(spieler, i) in spielers" :key="`Spieler${i}`">
+      <Spieler
+        :index="i"
+        :am-zug="current === i"
+        @spielt="spielen" />
+    </div>
   </div>
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
-import Sau from './components/Sau.vue'
-
-export default {
-  name: 'app',
-  components: {
-    HelloWorld
-  }
-}
-</script>
 <style lang="stylus">
 #app
   font-family 'Avenir', Helvetica, Arial, sans-serif
-  -webkit-font-smoothing antialiased
-  -moz-osx-font-smoothing grayscale
   text-align center
   color #2c3e50
   margin-top 60px
 </style>
+
+<script>
+import ConfigGame from './components/ConfigGame.vue'
+import Spieler from './components/Spieler.vue'
+
+export default {
+  name: 'app',
+  computed: {
+    current: function () { return this.$store.state.current },
+    spielers: function () { return this.$store.state.spieler }
+  },
+  components: {
+    ConfigGame,
+    Spieler
+  },
+  methods: {
+    start: function (anzahlSpieler) {
+      this.$store.dispatch('neuesSpiel', anzahlSpieler)
+    },
+    spielen: function (spieltEvent) {
+      console.log(spieltEvent)
+    }
+  }
+}
+</script>
