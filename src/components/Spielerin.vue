@@ -53,7 +53,7 @@ export default {
   },
   methods: {
     abwerfen () {
-      this.$store.dispatch("abwerfen", this.id)
+      this.$store.dispatch('abwerfen', this.id)
     }
   }
 }
