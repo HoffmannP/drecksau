@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.38a599c10dd5efef6a2d4f068267219f.js"
+  "/drecksau/precache-manifest.540b5bec8d9b8f3d0fa2c6b92b6fd59b.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "drecksau"});
