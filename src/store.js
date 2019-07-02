@@ -8,7 +8,7 @@ const HANDKARTEN = 3
 const SCHWEINE_PRO_SPIELERIN = [undefined, undefined, 5, 4, 3]
 const DEFAULT_SCHWEIN = _ => ({
   dreckig: false,
-  scheune: false,
+  stall: false,
   blitzableiter: false,
   vernagelt: false,
   highlight: ''
@@ -22,7 +22,7 @@ export default new Vuex.Store({
   strict: true,
   state: {
     current: 0,
-    aktive_karte: null,
+    aktive_karte: undefined,
     schweine: [],
     karten: [],
     spielerin_schweine: [],
@@ -57,15 +57,16 @@ export default new Vuex.Store({
     },
     eigeneSchweine (state, getters) {
       return karteId => getters.schweine(getters.spielerinDerKarte(karteId))
+        .map(s => getters.schwein(s))
     },
     fremdeSchweine (state, getters) {
       return karteId => state.spielerin_schweine
         .filter(s => s.id !== getters.spielerinDerKarte(karteId))
         .map(s => s.schweine).flat()
+        .map(s => getters.schwein(s))
     },
     alleSchweine (state) {
-      return state.spielerin_schweine
-        .map(s => s.schweine).flat()
+      return state.schweine
     },
 
     fremdeSchweineMitStallOhneBlitzableiter (state, getters) {
@@ -95,10 +96,11 @@ export default new Vuex.Store({
         blitzableiter: getters.eigeneSchweineMitStallOhneBlitzableiter,
         matschen: getters.eigeneSchweineNichtDreckig,
         regen: getters.alleSchweineDreckigOhneStall,
-        scheune: getters.eigeneSchweineOhneStall,
+        stall: getters.eigeneSchweineOhneStall,
         waschen: getters.fremdeSchweineDreckig,
         vernagelt: getters.eigeneSchweineDreckigMitStallOhneVernagelt
       }[getters.karte(karteId).value](karteId))
+        .map(s => s.id)
     },
     modifiedSchwein (state, getters) {
       return function (karteId, schweinId) {
@@ -118,8 +120,8 @@ export default new Vuex.Store({
           case 'waschen':
             schwein.dreckig = false
             break
-          case 'scheune':
-            schwein.scheune = true
+          case 'stall':
+            schwein.stall = true
             break
           case 'vernagelt':
             schwein.vernagelt = true
@@ -142,7 +144,7 @@ export default new Vuex.Store({
       state.schweine = [ ...state.schweine.map(s => ({ ...s, highlight: schweine.includes(s.id) ? highlight : '' })) ]
     },
     setKarte (state, karte) {
-      state.karten = [...state.karten.filter(s => s !== karte.id), karte]
+      state.karten = [...state.karten.filter(s => s.id !== karte.id), karte]
     },
     setAktiveKarte (state, karteId) {
       state.aktive_karte = karteId
@@ -158,10 +160,13 @@ export default new Vuex.Store({
       state.spielerinnen.push(spielerinId)
     },
     updateCurrent (state) {
-      state.current = (state.current + 1) % state.spielerinnen
+      state.current = (state.current + 1) % state.spielerinnen.length
     },
     newKarte (state, karteId) {
       Vue.set(state.karten, karteId, neueKarte())
+    },
+    regen (state) {
+      state.schweine = [ ...state.schweine.map(s => ({ ...s, dreckig: s.dreckig && s.stall })) ]
     }
   },
   actions: {
@@ -171,12 +176,21 @@ export default new Vuex.Store({
       }
     },
     karteTesten ({ commit, getters }, karteId) {
+      if (getters.spielerinDerKarte(karteId) !== getters.current) {
+        return
+      }
       commit('highlightSchwein', {
         schweine: getters.aktionSelektion(karteId),
         highlight: ['blitz', 'blitzableiter', 'vernagelt'].includes(getters.karte(karteId).value) ? 'stall' : 'schwein'
       })
     },
     karteSpielen ({ dispatch, commit, getters }, karteId) {
+      if (getters.spielerinDerKarte(karteId) !== getters.current) {
+        return
+      }
+      if (getters.karte(karteId).value === 'regen' && getters.aktiveKarte === undefined) {
+        return dispatch('regen', karteId)
+      }
       if (getters.aktiveKarte === karteId) {
         commit('setAktiveKarte')
         dispatch('karteVerlassen', karteId)
@@ -185,19 +199,30 @@ export default new Vuex.Store({
         dispatch('karteTesten', karteId)
       }
     },
+    regen ({ commit, dispatch, getters }, karteId) {
+      commit('setAktiveKarte', karteId)
+      commit('regen')
+      return dispatch('zugEnde')
+    },
     karteVerlassen ({ commit, getters }, karteId) {
       if (getters.aktiveKarte === undefined) {
         commit('highlightSchwein', { schweine: [] })
       }
     },
-    zielWaehlen ({ commit, getters }, schweinId) {
+    zielWaehlen ({ commit, dispatch, getters }, schweinId) {
       if (getters.aktiveKarte && getters.aktionSelektion(getters.aktiveKarte).includes(schweinId)) {
         commit('setSchwein', getters.modifiedSchwein(getters.aktiveKarte, schweinId))
-        commit('setKarte', { id: getters.aktiveKarte, value: neueKarte() })
-        commit('setAktiveKarte')
-        commit('highlightSchwein', { schweine: [] })
-        commit('updateCurrent')
+        dispatch('zugEnde')
       }
+    },
+    zugEnde ({ commit, getters }) {
+      commit('setKarte', { id: getters.aktiveKarte, value: neueKarte() })
+      commit('setAktiveKarte')
+      commit('highlightSchwein', { schweine: [] })
+      commit('updateCurrent')
+    },
+    abwerfen ({ commit, getters }, spielerId) {
+      getters.karten(spielerId).forEach(k => commit('setKarte', { id: k, value: neueKarte() }))
     }
   }
 })

@@ -2,9 +2,7 @@
   <div id="app">
     <img alt="Drecksau" src="./assets/dreckig.png">
     <ConfigGame v-if="spielerinnen.length === 0" @start="start" />
-    <div v-for="spielerinId in spielerinnen" :key="spielerinId">
-      <Spielerin :id="spielerinId" />
-    </div>
+    <Spielerin v-for="spielerinId in spielerinnen" :key="spielerinId" :id="spielerinId" />
   </div>
 </template>
 

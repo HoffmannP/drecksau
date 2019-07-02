@@ -1,20 +1,28 @@
 <template>
-  <div>
+  <div :class="{ amZug: amZug }">
     <h2>Spielerin {{ id }}</h2>
-    <div v-if="amZug">am Zug</div>
     <div v-if="gewonnen">Gewonnen!</div>
 
-    <div v-for="schweinId in schweine" :key="schweinId">
-      <Schwein :id="schweinId" />
+    <div class="schweine">
+      <Schwein v-for="schweinId in schweine" :key="schweinId" :id="schweinId" />
     </div>
 
-    <div v-for="karteId in karten" :key="karteId">
-      <Karte :id="karteId" />
+    <div class="karten">
+      <Karte v-for="karteId in karten" :key="karteId" :id="karteId" />
+      <button @click="abwerfen">Hand abwerfen</button>
     </div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
+div.amZug
+  background lightyellow
+div:not(.amZug) > .karten
+  opacity .5
+button
+  transform: rotate(-90deg);
+  transform-origin: left top;
+  margin-left: 10px;
 </style>
 
 <script>
@@ -41,6 +49,11 @@ export default {
     },
     gewonnen () {
       return this.$store.getters.gewonnen(this.id)
+    }
+  },
+  methods: {
+    abwerfen () {
+      this.$store.dispatch("abwerfen", this.id)
     }
   }
 }

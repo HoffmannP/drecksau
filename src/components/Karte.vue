@@ -5,6 +5,8 @@
 </template>
 
 <style lang="stylus" scoped>
+div
+  display contents
 img
   border 3px solid transparent
   border-radius 10px
