@@ -4,7 +4,7 @@
     <div>
       <label>
         Anzahl Spieler*innen:
-        <input type="number" min="2" max="4" v-model="spieler"/>
+        <input type="number" min="2" max="4" v-model="anzahl_spielerinnen"/>
       </label>
     </div>
     <div>
@@ -13,21 +13,21 @@
   </div>
 </template>
 
+<style lang="scss" scoped>
+
+</style>
+
 <script>
 export default {
   data: function () {
     return {
-      spieler: 2
+      anzahl_spielerinnen: 2
     }
   },
   methods: {
     start: function () {
-      this.$emit('start', this.spieler)
+      this.$emit('start', this.anzahl_spielerinnen)
     }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

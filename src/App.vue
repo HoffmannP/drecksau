@@ -1,12 +1,9 @@
 <template>
   <div id="app">
     <img alt="Drecksau" src="./assets/dreckig.png">
-    <ConfigGame v-if="spielers.length === 0" @start="start" />
-    <div v-for="(spieler, i) in spielers" :key="`Spieler${i}`">
-      <Spieler
-        :index="i"
-        :am-zug="current === i"
-        @spielt="spielen" />
+    <ConfigGame v-if="spielerinnen.length === 0" @start="start" />
+    <div v-for="spielerinId in spielerinnen" :key="spielerinId">
+      <Spielerin :id="spielerinId" />
     </div>
   </div>
 </template>
@@ -21,24 +18,22 @@
 
 <script>
 import ConfigGame from './components/ConfigGame.vue'
-import Spieler from './components/Spieler.vue'
+import Spielerin from './components/Spielerin.vue'
 
 export default {
   name: 'app',
   computed: {
-    current: function () { return this.$store.state.current },
-    spielers: function () { return this.$store.state.spieler }
+    spielerinnen: function () {
+      return this.$store.getters.spielerinnen
+    }
   },
   components: {
     ConfigGame,
-    Spieler
+    Spielerin
   },
   methods: {
-    start: function (anzahlSpieler) {
-      this.$store.dispatch('neuesSpiel', anzahlSpieler)
-    },
-    spielen: function (spieltEvent) {
-      console.log(spieltEvent)
+    start: function (anzahlSpielerinnen) {
+      this.$store.dispatch('addSpielerinnen', anzahlSpielerinnen)
     }
   }
 }
