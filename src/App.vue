@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <img alt="Drecksau" src="./assets/dreckig.png">
-    <ConfigGame v-if="spielerinnen.length === 0" @start="start" />
+    <Config v-if="spielerinnen.length === 0" @start="start" />
     <Spielerin v-for="spielerinId in spielerinnen" :key="spielerinId" :id="spielerinId" />
   </div>
 </template>
@@ -15,7 +15,7 @@
 </style>
 
 <script>
-import ConfigGame from './components/ConfigGame.vue'
+import Config from './components/Config.vue'
 import Spielerin from './components/Spielerin.vue'
 
 export default {
@@ -26,7 +26,7 @@ export default {
     }
   },
   components: {
-    ConfigGame,
+    Config,
     Spielerin
   },
   methods: {
