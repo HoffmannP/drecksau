@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <img alt="Drecksau" src="./assets/dreckig.png">
-    <Config v-if="spielerinnen.length === 0" @start="start" />
+    <Config v-if="spielerinnen.length === 0" />
     <Spielerin v-for="spielerinId in spielerinnen" :key="spielerinId" :id="spielerinId" />
   </div>
 </template>
@@ -28,11 +28,6 @@ export default {
   components: {
     Config,
     Spielerin
-  },
-  methods: {
-    start: function (anzahlSpielerinnen) {
-      this.$store.dispatch('addSpielerinnen', anzahlSpielerinnen)
-    }
   }
 }
 </script>

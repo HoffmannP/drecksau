@@ -7,7 +7,6 @@ const KARTEN = Array.prototype.concat(
   Array(8).fill('waschen'),
   Array(4).fill('vernagelt')
 )
-let kartenstapel = mischen(KARTEN)
 
 function mischen (stapel) {
   for (let i = stapel.length - 1; i > 0; i--) {
@@ -17,6 +16,36 @@ function mischen (stapel) {
   return stapel
 }
 
-export default function () {
+export function endlosStapel () {
+  return KARTEN[Math.floor(Math.random() * KARTEN)]
+}
+
+let kartenstapel = mischen(KARTEN)
+
+export function einfacherStapel () {
+  if (kartenstapel.length === 0) {
+    kartenstapel = mischen(KARTEN)
+  }
   return kartenstapel.pop()
+}
+
+export function wegwerfen (karte) {
+  /* do nothing */
+}
+
+export class richtigerStapel {
+  constructor () {
+    this.stapel = mischen(KARTEN)
+    this.ablage = []
+  }
+  ziehen () {
+    if (this.stapel.length === 0) {
+      this.stapel = mischen(this.ablage)
+      this.ablage = []
+    }
+    return this.stapel.pop()
+  }
+  ablegen (karte) {
+    this.ablage.push(karte)
+  }
 }

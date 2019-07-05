@@ -14,10 +14,6 @@ const DEFAULT_SCHWEIN = _ => ({
   highlight: ''
 })
 
-function genId (state, category) {
-  return `${category}:${state[category].length}`
-}
-
 export default new Vuex.Store({
   strict: true,
   state: {
@@ -149,8 +145,7 @@ export default new Vuex.Store({
     setAktiveKarte (state, karteId) {
       state.aktive_karte = karteId
     },
-    addSpielerin (state, anzahlSchweine) {
-      const spielerinId = genId(state, 'spielerinnen')
+    addSpielerin (state, { spielerinId, anzahlSchweine }) {
       const schweine = Array(anzahlSchweine).fill(DEFAULT_SCHWEIN()).map((s, i) => ({ ...s, id: `schwein:${spielerinId}:${i}` }))
       const karten = Array(HANDKARTEN).fill({}).map((_, i) => ({ id: `karte:${spielerinId}:${i}`, value: neueKarte() }))
       state.schweine = [...state.schweine, ...schweine]
@@ -170,10 +165,9 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    addSpielerinnen ({ commit }, anzahlSpielerinnen) {
-      for (let i = 0; i < anzahlSpielerinnen; i++) {
-        commit('addSpielerin', SCHWEINE_PRO_SPIELERIN[anzahlSpielerinnen])
-      }
+    addSpielerinnen ({ commit }, spielerinnen) {
+      console.log(spielerinnen)
+      spielerinnen.forEach(s => commit('addSpielerin', { spielerinId: s, anzahlSchweine: SCHWEINE_PRO_SPIELERIN[spielerinnen.length] }))
     },
     karteTesten ({ commit, getters }, karteId) {
       if (getters.spielerinDerKarte(karteId) !== getters.current) {
